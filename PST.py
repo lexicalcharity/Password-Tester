@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox, SOLID, SUNKEN
 from tkinter import *
 from tkinter import font as tkFont
+import re
 
 
 def pass_strength():
@@ -9,59 +10,74 @@ def pass_strength():
     ip = entry.get()
 
     minimum_length = 12
-    uppercase = False
-    lowercase = False
-    numeric = False
+    uppercase = bool(re.search(r'[A-Z]', ip))
+    lowercase = bool(re.search(r'[a-z]', ip))
+    numeric = bool(re.search(r'\d', ip))
+    special_character = bool(re.search(r'[^a-zA-Z0-9]', ip))
     weak_password = False
 
 
-    for ch in ip: 
-        if ch.isupper():
-            uppercase = True
+    # for ch in ip: 
+    #     if ch.isupper():
+    #         uppercase = True
         
-        elif ch.islower():
-            lowercase= True
+    #     elif ch.islower():
+    #         lowercase= True
             
-        elif ch.isnumeric():
-            numeric = True
+    #     elif ch.isnumeric():
+    #         numeric = True
+
+    #     elif ch.isalnum():
+
             
     #print(uppercase, lowercase, numeric)
     if len(ip) < minimum_length and ip !="":
         print("Minimum password should be atleast 12 characters long")
         messagebox.showwarning("Error", "Password should be atleast 12 characters long")
         weak_password = True
+        result.config(text="Weak Password", fg="red")
 
-    elif ( ip == "" or (uppercase is False and lowercase is False and numeric is False)):
+    elif ( ip == "" or (uppercase is False and lowercase is False and numeric is False and special_character is False)):
         print("invalid password")
         messagebox.showerror("Error", "Invalid Password")
         weak_password = True
+
 
     elif uppercase is not True:
         print("Password should contain atleast 1 uppercase character")
         messagebox.showerror( "Error", "Should have atleast 1 uppercase character")
         weak_password = True
+        result.config(text="Weak Password", fg="red")
+
 
     elif lowercase is not True:
         print("Password should contain atleast 1 lowercase character")
         messagebox.showerror( "Error", "Should have atleast 1 lowercase character")
-
         weak_password = True
+        result.config(text="Weak Password", fg="red")
+
 
     elif numeric is not True:
         print("Password should contain atleast 1 numeric character")
         messagebox.showerror( "Error", "Should have atleast 1 numeric character")
-
         weak_password = True
+        result.config(text="Weak Password", fg="red")
+
+    elif special_character is not True:
+        print("Password should contain atleast 1 special character")
+        messagebox.showerror( "Error", "Should have atleast 1 special character")
+        weak_password = True
+        result.config(text="Weak Password", fg="red")
+
+
+
 
     else: 
         print("Password accepted")
-        top = Toplevel()
-        top.title("Password Accepted")
-        green_window = Message(top, text="Password Accepted")
-        green_window.config(bg= "lightgreen")
-        green_window.pack()
-       
+             
         weak_password = False
+        result.config(text="Strong Password", fg="Green")
+
 
     print("Is it a weak password:", weak_password) 
 
@@ -79,6 +95,7 @@ if __name__ == "__main__":
     label_font = tkFont.Font(family="Arial", size=14)
     entry_font = tkFont.Font(family="Consolas", size=14) # Monospaced font for entry looks good
     button_font = tkFont.Font(family="Arial", size=12, weight="bold")
+    result_font = tkFont.Font(family="Arial", size=12, weight="bold")
 
     # --- Main Container Frame (for overall padding and centering) ---
     # A central frame helps to group everything and center it within the root window.
@@ -118,7 +135,7 @@ if __name__ == "__main__":
         bd=2, # Softer border for the entry field
         width=35, # Slightly wider entry field
         font=entry_font,
-        show="*" # Hide characters for password input
+        #show="*" # Hide characters for password input
     )
     entry.pack(pady=(0, 20), anchor="center") # Add more padding below, center it
 
@@ -137,21 +154,13 @@ if __name__ == "__main__":
     )
     submit_button.pack(anchor="center", ipadx=15, ipady=8) # Center, add internal padding
 
-    
-    # label_frame = tk.Frame(root, relief= SOLID, borderwidth=2).pack(pady=20, fill="x")
+    result = tk.Label(
+        input_button_frame,
+        text = "",
+        font=result_font
+    )
+    result.pack(anchor="center", ipadx=20, ipady=8) # Center, add internal padding
 
-    # heading = tk.Label(label_frame, text="Password Strength box", font="Calibri 18",justify="center")
-    # heading.pack(pady=10, expand=True, fill="both")
-
-    # input_button_frame= tk.Frame(root)
-    # input_button_frame.pack(pady=20)
-
-    # lable = tk.Label(input_button_frame, text = "Enter Password")
-    # entry = tk.Entry(input_button_frame, bd=4, width=30)
-    # button = tk.Button(input_button_frame, text="Submit", command=pass_strength)
-    # lable.pack(pady=(0, 5), anchor="center")
-    # entry.pack(pady=(0,10), anchor="center")
-    # button.pack(anchor="center")
 
     
 
