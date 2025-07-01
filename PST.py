@@ -17,25 +17,27 @@ def pass_strength():
     weak_password = False
 
 
-    # for ch in ip: 
-    #     if ch.isupper():
-    #         uppercase = True
-        
-    #     elif ch.islower():
-    #         lowercase= True
-            
-    #     elif ch.isnumeric():
-    #         numeric = True
+#    """   Patterns checked:
+#     1. Three or more identical consecutive characters (e.g., 'aaa', '111').
+#     2. Common ascending letter sequences of 3+ characters (e.g., 'abc', 'xyz').
+#     3. Common descending letter sequences of 3+ characters (e.g., 'cba', 'zyx').
+#     4. Common ascending digit sequences of 3+ characters (e.g., '123', '789').
+#     5. Common descending digit sequences of 3+ characters (e.g., '321', '987').
+#  """
+    identical_pass= r"(.)\1{2,}"
+    ascending_letter_pass = r"abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz"
+    descending_letters_pass = r"cba|edc|fed|gfe|ihg|kji|mlk|onm|qpo|tsr|vut|xwv|zyx"
+    ascending_digits_pass = r"012|123|234|345|456|567|678|789"
+    descending_digits_pass = r"210|321|432|543|654|765|876|987"
 
-    #     elif ch.isalnum():
 
             
     #print(uppercase, lowercase, numeric)
     if len(ip) < minimum_length and ip !="":
         print("Minimum password should be atleast 12 characters long")
-        messagebox.showwarning("Error", "Password should be atleast 12 characters long")
+        messagebox.showerror("Error", "Password should be atleast 12 characters long")
         weak_password = True
-        result.config(text="Weak Password", fg="red")
+        #result.config(text="Weak Password", fg="red")
 
     elif ( ip == "" or (uppercase is False and lowercase is False and numeric is False and special_character is False)):
         print("invalid password")
@@ -47,39 +49,76 @@ def pass_strength():
         print("Password should contain atleast 1 uppercase character")
         messagebox.showerror( "Error", "Should have atleast 1 uppercase character")
         weak_password = True
-        result.config(text="Weak Password", fg="red")
+        #result.config(text="Weak Password", fg="red")
 
 
     elif lowercase is not True:
         print("Password should contain atleast 1 lowercase character")
         messagebox.showerror( "Error", "Should have atleast 1 lowercase character")
         weak_password = True
-        result.config(text="Weak Password", fg="red")
+        #result.config(text="Weak Password", fg="red")
 
 
     elif numeric is not True:
         print("Password should contain atleast 1 numeric character")
         messagebox.showerror( "Error", "Should have atleast 1 numeric character")
         weak_password = True
-        result.config(text="Weak Password", fg="red")
+        #result.config(text="Weak Password", fg="red")
 
     elif special_character is not True:
         print("Password should contain atleast 1 special character")
         messagebox.showerror( "Error", "Should have atleast 1 special character")
         weak_password = True
-        result.config(text="Weak Password", fg="red")
-
-
+        #result.config(text="Weak Password", fg="red")
 
 
     else: 
         print("Password accepted")
-             
-        weak_password = False
-        result.config(text="Strong Password", fg="Green")
+        if re.search(identical_pass,ip,re.IGNORECASE):
+            weak_password=True           
+            result.config(text="Weak Password", fg="Red")
+            messagebox.showwarning( "Weak Password", "Pattern recognized")
+
+
+
+        elif re.search(ascending_letter_pass,ip,re.IGNORECASE):
+            weak_password=True           
+            result.config(text="Weak Password", fg="Red")
+            messagebox.showwarning( "Weak Password", "Pattern recognized")
+
+
+        elif re.search(descending_letters_pass,ip,re.IGNORECASE):
+            weak_password=True           
+            result.config(text="Weak Password", fg="Red")
+            messagebox.showwarning( "Weak Password", "Pattern recognized")
+
+        elif re.search(ascending_digits_pass,ip,re.IGNORECASE):
+            weak_password=True           
+            result.config(text="Weak Password", fg="Red")
+            messagebox.showwarning( "Weak Password", "Pattern recognized")
+
+        elif re.search(descending_digits_pass,ip,re.IGNORECASE):
+            weak_password=True           
+            result.config(text="Weak Password", fg="Red")  
+            messagebox.showwarning( "Weak Password", "Pattern recognized")
+      
+        else:
+            weak_password = False
+            result.config(text="Strong Password", fg="Green")
+
 
 
     print("Is it a weak password:", weak_password) 
+
+    
+#reset Gui to Intial state
+
+def inital_state():
+    entry.delete(0, tk.END)
+    result.config(text="", fg="Green")
+
+
+
 
 
 
@@ -96,6 +135,7 @@ if __name__ == "__main__":
     entry_font = tkFont.Font(family="Consolas", size=14) # Monospaced font for entry looks good
     button_font = tkFont.Font(family="Arial", size=12, weight="bold")
     result_font = tkFont.Font(family="Arial", size=12, weight="bold")
+    reset_font = tkFont.Font(family="Arial", size=12, weight="bold")
 
     # --- Main Container Frame (for overall padding and centering) ---
     # A central frame helps to group everything and center it within the root window.
@@ -138,28 +178,90 @@ if __name__ == "__main__":
         #show="*" # Hide characters for password input
     )
     entry.pack(pady=(0, 20), anchor="center") # Add more padding below, center it
+    
+ # --- Button Frame to group Check and Reset buttons ---
+    button_frame = tk.Frame(main_frame, bg="#F0F0F0")
+    button_frame.pack(pady=(0, 20)) # Padding below buttons
 
     # Submit Button
     submit_button = tk.Button(
-        input_button_frame,
+        button_frame, # Pack into the new button_frame
         text="Check Strength",
         command=pass_strength,
         font=button_font,
-        bg="#4CAF50", # Material design green for primary action
-        fg="white", # White text for contrast
-        activebackground="#45A049", # Darker green when pressed
+        bg="#4CAF50",
+        fg="white",
+        activebackground="#45A049",
         activeforeground="white",
-        relief=tk.RAISED, # Raised button effect
-        bd=3 # Border for button
+        relief=tk.RAISED,
+        bd=3
     )
-    submit_button.pack(anchor="center", ipadx=15, ipady=8) # Center, add internal padding
+    submit_button.pack(side=tk.LEFT, ipadx=20, ipady=10, padx=(0, 10)) # Keep a small padx between buttons
 
-    result = tk.Label(
-        input_button_frame,
-        text = "",
-        font=result_font
+    # Reset Button
+    reset = tk.Button(
+        button_frame, # Pack into the new button_frame
+        text="Reset",
+        command=inital_state,
+        font=reset_font,
+        bg="#4CAF50",
+        fg="white",
+        activebackground="#45A049",
+        activeforeground="white",
+        relief=tk.RAISED,
+        bd=3
     )
-    result.pack(anchor="center", ipadx=20, ipady=8) # Center, add internal padding
+    reset.pack(side=tk.RIGHT, ipadx=20, ipady=10)
+
+    # Result Label - placed after buttons
+    result = tk.Label(
+        main_frame, # Pack directly into main_frame
+        text = "",
+        font=result_font,
+        bg="#F0F0F0", # Ensure background matches main frame
+        fg="black" # Default text color
+    )
+    result.pack(pady=(10,0), anchor="center") # Add padding above, center it
+
+
+    # # Submit Button
+    # submit_button = tk.Button(
+    #     input_button_frame,
+    #     text="Check Strength",
+    #     command=pass_strength,
+    #     font=button_font,
+    #     bg="#4CAF50", # Material design green for primary action
+    #     fg="white", # White text for contrast
+    #     activebackground="#45A049", # Darker green when pressed
+    #     activeforeground="white",
+    #     relief=tk.RAISED, # Raised button effect
+    #     bd=3 # Border for button
+    # )
+    # submit_button.pack(side=tk.LEFT, ipadx=20, ipady=10, padx=(0, 10))
+
+    # reset = tk.Button( 
+    #     input_button_frame,
+    #     text="Reset",
+    #     command=inital_state,
+    #     font=reset_font,
+    #     bg="#4CAF50", # Material design green for primary action
+    #     fg="white", # White text for contrast
+    #     activebackground="#45A049", # Darker green when pressed
+    #     activeforeground="white",
+    #     relief=tk.RAISED, # Raised button effect
+    #     bd=3 # Border for button
+    # )
+    # reset.pack(side=tk.RIGHT, ipadx=20, ipady=10) 
+
+    # #reset.pack(side=RIGHT,ipadx=15, ipady=8)
+
+    # result = tk.Label( 
+    #     input_button_frame,
+    #     text = "",
+    #     font=result_font
+    # )
+    # #result.pack(anchor="s", ipadx=20, ipady=8) # Center, add internal padding
+    # result.pack(side=tk.TOP)
 
 
     
