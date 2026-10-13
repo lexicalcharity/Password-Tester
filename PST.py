@@ -7,7 +7,7 @@ import re
 # Function to check password strength
 def pass_strength():
 
-    ip = entry.get().strip() # Get the input from the entry field
+    ip = entry.get() # Get the input exactly as typed (spaces are valid password characters)
 
     minimum_length = 12 # Minimum length for the password
     # Check for uppercase, lowercase, numeric, and special characters
@@ -29,50 +29,49 @@ def pass_strength():
 #  """
     identical_pass= r"(.)\1{2,}"
     ascending_letter_pass = r"abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz"
-    descending_letters_pass = r"cba|edc|fed|gfe|ihg|kji|mlk|onm|qpo|tsr|vut|xwv|zyx"
+    descending_letters_pass = r"cba|dcb|edc|fed|gfe|hgf|ihg|jih|kji|lkj|mlk|nml|onm|pon|qpo|rqp|srq|tsr|uts|vut|wvu|xwv|yxw|zyx"
     ascending_digits_pass = r"012|123|234|345|456|567|678|789"
     descending_digits_pass = r"210|321|432|543|654|765|876|987"
 
-    # Check the length of the password:
+    # ---Check the basic requirements---
+    # Each failed rule is stored as (popup title, result label text, popup message)
+    error = None
 
-    # If the password is less than the minimum length or empty, show an error
-    if len(ip) < minimum_length and ip !="":        
-        print("Minimum password should be atleast 12 characters long")
-        messagebox.showerror("Length Error", "Password should be atleast 12 characters long")
-        weak_password = True
+    # Empty input
+    if ip == "":
+        error = ("Input Error", "Please enter a password", "Please enter a password.")
 
-    # Check for empty input or missing all character types
-    elif ( ip == "" or (uppercase is False and lowercase is False and numeric is False and special_character is False)):    
-        print("invalid password")
-        messagebox.showerror("Input Error", "Please enter a valid password.")
-        weak_password = True
+    # Password shorter than the minimum length
+    elif len(ip) < minimum_length:
+        error = ("Length Error", "Weak Password: Too short", "Password should be at least 12 characters long.")
 
     #----Check for missing uppercase, lowercase, numeric, or special characters----
-    elif uppercase is not True:
-        print("Password should contain atleast 1 uppercase character")
-        messagebox.showerror( "Uppercase Input Error", "Password should contain at least 1 uppercase character.")
-        weak_password = True
+    elif not uppercase:
+        error = ("Uppercase Input Error", "Weak Password: No uppercase letter", "Password should contain at least 1 uppercase character.")
 
-    elif lowercase is not True:
-        print("Password should contain atleast 1 lowercase character")
-        messagebox.showerror( "Lowercase Input Error", "Password should contain at least 1 lowercase character.")
-        weak_password = True
+    elif not lowercase:
+        error = ("Lowercase Input Error", "Weak Password: No lowercase letter", "Password should contain at least 1 lowercase character.")
 
-    elif numeric is not True:
-        print("Password should contain atleast 1 numeric character")
-        messagebox.showerror( "Numeric Input Error", "Password should contain at least 1 numeric character.")
-        weak_password = True
+    elif not numeric:
+        error = ("Numeric Input Error", "Weak Password: No digit", "Password should contain at least 1 numeric character.")
 
-    elif special_character is not True:
-        print("Password should contain atleast 1 special character")
-        messagebox.showerror( "Special character Input Error", "Password should contain at least 1 special character.")
+    elif not special_character:
+        error = ("Special character Input Error", "Weak Password: No special character", "Password should contain at least 1 special character.")
+
+    # If a basic requirement failed, update the result label and show the error
+    if error:
         weak_password = True
+        error_title, error_label, error_message = error
+        result.config(
+            text=error_label,
+            fg="#D32F2F",  # Material Red 700
+            bg="#FFF3F3",  # Light red background
+            font=(result_font.actual('family'), 14, 'bold')
+        )
+        messagebox.showerror(error_title, error_message)
 
     # If the password meets all criteria, check for weak patterns
-    # If all checks pass, the password is accepted
-    else: 
-        print("Password accepted")
-
+    else:
         # ---Check for weak password:----
         
         # Identical consecutive characters
@@ -139,9 +138,8 @@ def pass_strength():
                 bg="#E8F5E9", # Light green background
                 font=(result_font.actual('family'), 14, 'bold')
             )
-    print("Is it a weak password:", weak_password) 
 
-    
+
 # Function to reset the entry field and result label
 # This function clears the entry field and resets the result label
 def inital_state():
